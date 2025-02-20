@@ -16,7 +16,7 @@ app.use(cors()); // Erlaubt Anfragen von anderen Domains
 app.use(express.json()); // Kann JSON-Daten verarbeiten
 
 // 6. Erste Testroute - zeigt, dass der Server läuft
-app.get("/api/test", (req, res) => {
+app.get("/", (req, res) => {
   res.json({ message: "Backend ist online!" });
 });
 

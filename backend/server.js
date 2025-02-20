@@ -9,8 +9,15 @@ dotenv.config();
 // 2. Lade Umgebungsvariablen
 const app = express();
 
-const corsOptions = {
+/*const corsOptions = {
   origin: ["http://localhost:5173", "https://maschinensehen.vercel.app"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+};*/
+
+const corsOptions = {
+  origin: "*", // Erlaubt erstmal alle Origins für Testing
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
@@ -19,6 +26,11 @@ const corsOptions = {
 // 4. Middleware - Hilfsfunktionen für jede Anfrage
 app.use(cors(corsOptions)); // Erlaubt Anfragen von anderen Domains
 app.use(express.json()); // Kann JSON-Daten verarbeiten
+
+// Test-Route
+app.get("/test", (req, res) => {
+  res.json({ message: "Test route works!" });
+});
 
 // 5. Route für Satelliten-Position
 app.get("/api/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {

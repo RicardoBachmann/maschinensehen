@@ -4,8 +4,7 @@ const express = require("express"); // Web-Server Framework
 const cors = require("cors"); // Cross-Origin Resource Sharing Middleware
 const dotenv = require("dotenv"); // Lädt Umgebungsvariablen aus .env-Datei
 
-const path = require("path");
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config();
 
 // 2. Lade Umgebungsvariablen
 const app = express();

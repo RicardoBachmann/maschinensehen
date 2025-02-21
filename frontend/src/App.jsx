@@ -24,7 +24,7 @@ function App() {
       ? "http://localhost:3000"
       : "https://maschinensehen.vercel.app/";
 
-  const fetchSatelliteData = async () => {
+  /*const fetchSatelliteData = async () => {
     try {
       const lon = 10;
       const lat = 50;
@@ -43,7 +43,19 @@ function App() {
     } catch (error) {
       console.error("Error retrieving satellite data:", error);
     }
-  };
+  };*/
+
+  useEffect(() => {
+    const lon = 10;
+    const lat = 50;
+    const alt = 100;
+    const num = 1;
+    const id = 25544;
+
+    fetch(`${API_URL}/api/satellite/position/${lon}/${lat}/${alt}/${num}/${id}`)
+      .then((res) => res.json())
+      .then((data) => console.log(data));
+  }, []);
 
   return (
     <>

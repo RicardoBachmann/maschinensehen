@@ -16,6 +16,8 @@ const app = express();
   optionsSuccessStatus: 204,
 };*/
 
+console.log("API Key loaded:", process.env.N2YO_API_KEY ? "Yes" : "No");
+
 const corsOptions = {
   origin: "*", // Erlaubt erstmal alle Origins für Testing
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",

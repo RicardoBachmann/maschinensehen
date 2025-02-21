@@ -2,14 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "./backend/server.js",
+      "src": "backend/server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "./backend/server.js"
+      "src": "/test",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/satellite/position/(.*)",
+      "dest": "backend/server.js"
     }
   ]
 }

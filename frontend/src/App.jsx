@@ -29,7 +29,7 @@ function App() {
   console.log("Current NODE_ENV:", process.env.NODE_ENV);
 
   const fetchSatelliteData = async () => {
-    console.log("Starting fetch...");
+    console.log("Starting fetch....");
     try {
       const lon = 10;
       const lat = 50;

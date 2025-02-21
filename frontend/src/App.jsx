@@ -22,7 +22,7 @@ function App() {
   const API_URL =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://maschinensehen.vercel.app/";
+      : "https://maschinensehen-backend-qpivxs0n7-ricardobachmanns-projects.vercel.app";
 
   // Am Anfang der Komponente hinzufügen:
   console.log("Current API_URL:", API_URL);

@@ -24,7 +24,12 @@ function App() {
       ? "http://localhost:3000"
       : "https://maschinensehen.vercel.app/";
 
+  // Am Anfang der Komponente hinzufügen:
+  console.log("Current API_URL:", API_URL);
+  console.log("Current NODE_ENV:", process.env.NODE_ENV);
+
   const fetchSatelliteData = async () => {
+    console.log("Starting fetch...");
     try {
       const lon = 10;
       const lat = 50;
@@ -46,6 +51,7 @@ function App() {
   };
 
   useEffect(() => {
+    console.log("useEffect is running");
     fetchSatelliteData();
   }, []);
 

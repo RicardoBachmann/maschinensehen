@@ -41,6 +41,17 @@ const corsOptions = {
 app.use(cors(corsOptions)); // Erlaubt Anfragen von anderen Domains
 app.use(express.json()); // Kann JSON-Daten verarbeiten
 
+// Root-Route
+app.get("/", (req, res) => {
+  res.json({
+    message: "Maschinensehen API is running",
+    routes: {
+      test: "/test",
+      satellite: "/api/satellite/position/:lon/:lat/:alt/:num/:id",
+    },
+  });
+});
+
 // Test-Route
 app.get("/test", (req, res) => {
   res.json({

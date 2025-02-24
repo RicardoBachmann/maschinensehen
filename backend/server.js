@@ -20,11 +20,13 @@ process.on("uncaughtException", (error) => {
 });
 
 // ---- App Configuration ----
+// Load environment variables from .env file
 dotenv.config();
 
-// Umgebungsvariablen
+// Initialize Express application
 const app = express();
 
+// Configure CORS options
 const corsOptions = {
   origin: [
     "http://localhost:5173",
@@ -44,8 +46,9 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // ---- Routes ----
+// API endpoints for the application
 
-// Root-Route:
+// Root endpoint: Provides API information and available routes
 app.get("/", (req, res) => {
   res.json({
     message: "Maschinensehen API is running",
@@ -56,7 +59,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Test-Route:
+// Test endpoint: Validates API functionality and environment variables
 app.get("/test", (req, res) => {
   res.json({
     message: "Test route works!",
@@ -67,7 +70,7 @@ app.get("/test", (req, res) => {
   });
 });
 
-// Satelliten-Position-Route:
+// Satellite position endpoint: Retrieves satellite position data from N2YO API
 app.get("/api/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
   const { lon, lat, alt, num, id } = req.params;
 

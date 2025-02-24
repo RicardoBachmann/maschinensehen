@@ -19,7 +19,11 @@ const app = express();
 console.log("API Key loaded:", process.env.N2YO_API_KEY ? "Yes" : "No");
 
 const corsOptions = {
-  origin: "*", // Erlaubt erstmal alle Origins für Testing
+  origin: [
+    "http://localhost:5173",
+    "https://maschinensehen.vercel.app",
+    process.env.FRONTEND_URL, // Falls du eine andere Domain verwendest
+  ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,

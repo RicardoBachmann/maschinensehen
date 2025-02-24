@@ -41,7 +41,7 @@ const corsOptions = {
 app.use(cors(corsOptions)); // Erlaubt Anfragen von anderen Domains
 app.use(express.json()); // Kann JSON-Daten verarbeiten
 
-// Root-Route
+// Root-Route:
 app.get("/", (req, res) => {
   res.json({
     message: "Maschinensehen API is running",
@@ -52,7 +52,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Test-Route
+// Test-Route:
 app.get("/test", (req, res) => {
   res.json({
     message: "Test route works!",

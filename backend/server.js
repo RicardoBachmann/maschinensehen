@@ -1,30 +1,29 @@
-// 1. Importiere benötigte Bibliotheken
-const fetch = require("node-fetch");
-const express = require("express"); // Web-Server Framework
+// ---- Dependencies ----
+const fetch = require("node-fetch"); // Perform HTTP requests and retrieve local resources
+const express = require("express"); // Web application framework for Node.js
 const cors = require("cors"); // Cross-Origin Resource Sharing Middleware
-const dotenv = require("dotenv"); // Lädt Umgebungsvariablen aus .env-Datei
+const dotenv = require("dotenv"); // Load environment variables from .env file
 
+// ---- Error Handlers ----
+// Catch unhandled promise rejections
 process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  console.error("Unhandled Promise Rejection:");
+  console.error("- Promise:", promise);
+  console.error("- Reason:", reason);
 });
 
+// Catch uncaught exceptions to prevent server crash
 process.on("uncaughtException", (error) => {
-  console.error("Uncaught Exception:", error);
+  console.error("Uncaught Exception:");
+  console.error("- Error:", error.message);
+  console.error("- Stack", error.stack);
 });
 
+// ---- App Configuration ----
 dotenv.config();
 
-// 2. Lade Umgebungsvariablen
+// Umgebungsvariablen
 const app = express();
-
-/*const corsOptions = {
-  origin: ["http://localhost:5173", "https://maschinensehen.vercel.app"],
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-  optionsSuccessStatus: 204,
-};*/
-
-console.log("API Key loaded:", process.env.N2YO_API_KEY ? "Yes" : "No");
 
 const corsOptions = {
   origin: [
@@ -37,9 +36,14 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// 4. Middleware - Hilfsfunktionen für jede Anfrage
-app.use(cors(corsOptions)); // Erlaubt Anfragen von anderen Domains
-app.use(express.json()); // Kann JSON-Daten verarbeiten
+// ---- Middleware Configuration ----
+// Configure CORS for cross-origin request
+app.use(cors(corsOptions));
+
+// Parse incoming JSON payloads
+app.use(express.json());
+
+// ---- Routes ----
 
 // Root-Route:
 app.get("/", (req, res) => {
@@ -63,7 +67,7 @@ app.get("/test", (req, res) => {
   });
 });
 
-// 5. Route für Satelliten-Position
+// Satelliten-Position-Route:
 app.get("/api/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
   const { lon, lat, alt, num, id } = req.params;
 
@@ -88,11 +92,11 @@ app.get("/api/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
   }
 });
 
-// 6. Export für Vercel
+// ---- Server Export & Start ----
 module.exports = app;
 
-// 7. Starte den Server
 if (process.env.NODE_ENV !== "production") {
+  console.log("API Key loaded:", process.env.N2YO_API_KEY ? "Yes" : "No");
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
     console.log(`Server läuft auf Port ${PORT}`);

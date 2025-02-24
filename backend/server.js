@@ -4,6 +4,14 @@ const express = require("express"); // Web-Server Framework
 const cors = require("cors"); // Cross-Origin Resource Sharing Middleware
 const dotenv = require("dotenv"); // Lädt Umgebungsvariablen aus .env-Datei
 
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+});
+
 dotenv.config();
 
 // 2. Lade Umgebungsvariablen
@@ -35,7 +43,13 @@ app.use(express.json()); // Kann JSON-Daten verarbeiten
 
 // Test-Route
 app.get("/test", (req, res) => {
-  res.json({ message: "Test route works!" });
+  res.json({
+    message: "Test route works!",
+    envVars: {
+      nodeEnv: process.env.NODE_ENV,
+      hasApiKey: !!process.env.N2YO_API_KEY,
+    },
+  });
 });
 
 // 5. Route für Satelliten-Position

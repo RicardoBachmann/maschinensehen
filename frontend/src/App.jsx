@@ -6,36 +6,36 @@ function App() {
   const mapRef = useRef();
   const mapContainerRef = useRef();
 
+  // API URL Configuration
+  const API_URL =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://maschinensehen-backend-qpivxs0n7-ricardobachmanns-projects.vercel.app";
+
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
       center: [-74.5, 40],
-      zoom: 9,
+      zoom: 3,
     });
+
+    // Cleanup function
     return () => {
-      mapRef.current.remove();
+      if (mapRef.current) {
+        mapRef.current.remove();
+      }
     };
   }, []);
 
-  const API_URL =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : "https://maschinensehen-backend-qpivxs0n7-ricardobachmanns-projects.vercel.app";
-
-  // Am Anfang der Komponente hinzufügen:
-  console.log("Current API_URL:", API_URL);
-  console.log("Current NODE_ENV:", process.env.NODE_ENV);
-
   const fetchSatelliteData = async () => {
-    console.log("Starting fetch....");
     try {
       const lon = 10;
       const lat = 50;
       const alt = 100;
       const num = 1;
-      const id = 25544;
+      const id = 25544; // ISS ID
 
       const response = await fetch(
         `${API_URL}/api/satellite/position/${lon}/${lat}/${alt}/${num}/${id}`
@@ -45,13 +45,15 @@ function App() {
       }
       const data = await response.json();
       console.log("Satellite-Data:", data);
+      return data;
     } catch (error) {
       console.error("Error retrieving satellite data:", error);
+      return null;
     }
   };
 
+  // Retrieve initial satellite data
   useEffect(() => {
-    console.log("useEffect is running");
     fetchSatelliteData();
   }, []);
 

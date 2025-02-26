@@ -1,7 +1,6 @@
-import { createGlobalStyle } from "styled-components";
-
-export const GlobalStyle = createGlobalStyle`
- html, body, #root {
+html,
+body,
+#root {
   position: absolute;
   top: 0;
   right: 0;
@@ -15,4 +14,3 @@ export const GlobalStyle = createGlobalStyle`
   /* temporarily set the background color so we can tell where the map container is positioned */
   background-color: lightgrey;
 }
-`;

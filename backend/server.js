@@ -28,11 +28,7 @@ const app = express();
 
 // Configure CORS options
 const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "https://maschinensehen-r3mu.vercel.app",
-    process.env.FRONTEND_URL,
-  ],
+  origin: ["http://localhost:5173", "https://maschinensehen-r3mu.vercel.app"],
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
@@ -73,17 +69,10 @@ app.get("/test", (req, res) => {
 app.get("/api/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
   const { lon, lat, alt, num, id } = req.params;
 
-  console.log("Received satellite request with params:", {
-    lon,
-    lat,
-    alt,
-    num,
-    id,
-  });
+  console.log("Received request with params:", { lon, lat, alt, num, id });
 
   try {
     const apiUrl = `https://api.n2yo.com/rest/v1/satellite/positions/${id}/${lat}/${lon}/${alt}/${num}/?apiKey=${process.env.N2YO_API_KEY}`;
-
     console.log(
       "Fetching from N2YO API:",
       apiUrl.replace(process.env.N2YO_API_KEY, "HIDDEN_KEY")
@@ -91,25 +80,28 @@ app.get("/api/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
 
     const response = await fetch(apiUrl);
 
+    console.log("N2YO API Response status:", response.status);
+
     if (!response.ok) {
-      console.error(
-        "N2YO API response not OK",
-        response.status,
-        response.statusText
-      );
-      return res
-        .status(response.status)
-        .json({ error: "Failed to fetch satellite data" });
+      const errorText = await response.text();
+      console.error("N2YO API Error response:", errorText);
+      return res.status(response.status).json({
+        error: "Failed to fetch satellite data",
+        details: errorText,
+      });
     }
 
     const data = await response.json();
-
-    console.log("Satellite data received:", JSON.stringify(data, null, 2));
-
     res.json(data);
   } catch (error) {
-    console.error("Error in satellite position route:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Complete backend error:", error);
+    res.status(500).json({
+      error: "Failed to fetch satellite data",
+      details:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal Server Error",
+    });
   }
 });
 

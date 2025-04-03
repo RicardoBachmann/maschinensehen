@@ -10,7 +10,7 @@ function App() {
   const API_URL =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://maschinensehen-ifjm.vercel.app/";
+      : "https://maschinensehen-r3mu.vercel.app";
 
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;

@@ -73,24 +73,43 @@ app.get("/test", (req, res) => {
 app.get("/api/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
   const { lon, lat, alt, num, id } = req.params;
 
+  console.log("Received satellite request with params:", {
+    lon,
+    lat,
+    alt,
+    num,
+    id,
+  });
+
   try {
     const apiUrl = `https://api.n2yo.com/rest/v1/satellite/positions/${id}/${lat}/${lon}/${alt}/${num}/?apiKey=${process.env.N2YO_API_KEY}`;
+
     console.log(
-      "Fetching from:",
+      "Fetching from N2YO API:",
       apiUrl.replace(process.env.N2YO_API_KEY, "HIDDEN_KEY")
     );
+
     const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      console.error(
+        "N2YO API response not OK",
+        response.status,
+        response.statusText
+      );
+      return res
+        .status(response.status)
+        .json({ error: "Failed to fetch satellite data" });
+    }
+
     const data = await response.json();
+
+    console.log("Satellite data received:", JSON.stringify(data, null, 2));
+
     res.json(data);
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({
-      error: "Failed to fetch satellite data",
-      details:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal Server Error",
-    });
+    console.error("Error in satellite position route:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 

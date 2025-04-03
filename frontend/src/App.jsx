@@ -8,9 +8,10 @@ function App() {
 
   // API URL Configuration
   const API_URL =
-    process.env.NODE_ENV === "development"
+    import.meta.env.VITE_API_BASE_URL ||
+    (import.meta.env.DEV
       ? "http://localhost:3000"
-      : "https://maschinensehen-r3mu.vercel.app";
+      : "https://maschinensehen-r3mu.vercel.app");
 
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
@@ -31,24 +32,17 @@ function App() {
 
   const fetchSatelliteData = async () => {
     try {
-      const lon = 10;
-      const lat = 50;
-      const alt = 100;
-      const num = 1;
-      const id = 25544; // ISS ID
-
+      console.log("Fetching from:", API_URL);
       const response = await fetch(
-        `${API_URL}/api/satellite/position/${lon}/${lat}/${alt}/${num}/${id}`
+        `${API_URL}/api/satellite/position/10/50/100/1/25544`
       );
       if (!response.ok) {
-        throw new Error("Network response failed");
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       console.log("Satellite-Data:", data);
-      return data;
     } catch (error) {
       console.error("Error retrieving satellite data:", error);
-      return null;
     }
   };
 

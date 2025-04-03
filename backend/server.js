@@ -30,12 +30,11 @@ const app = express();
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://maschinensehen.vercel.app",
-    process.env.FRONTEND_URL, // Falls du eine andere Domain verwendest
+    "https://maschinensehen-r3mu.vercel.app",
+    process.env.FRONTEND_URL,
   ],
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-  optionsSuccessStatus: 204,
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 // ---- Middleware Configuration ----

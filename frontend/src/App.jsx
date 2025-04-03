@@ -19,7 +19,7 @@ function App() {
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
       center: [-74.5, 40],
-      zoom: 3,
+      zoom: 8,
     });
 
     // Cleanup function

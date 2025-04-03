@@ -28,31 +28,42 @@ function App() {
 
   const fetchSatelliteData = async () => {
     try {
+      // Detaillierte Logging-Informationen
+      console.log("Fetching satellite data...");
       console.log(
-        "Fetching from:",
-        `${API_URL}/api/satellite/position/10/50/100/1/25544`
+        "Full API URL:",
+        `${API_URL}/satellite/position/10/50/100/1/25544`
       );
+
       const response = await fetch(
-        `${API_URL}/api/satellite/position/10/50/100/1/25544`
+        `${API_URL}/satellite/position/10/50/100/1/25544`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
+
+      // Zusätzliche Debugging-Informationen
       console.log("Response status:", response.status);
-      console.log(
-        "Response headers:",
-        Object.fromEntries(response.headers.entries())
-      );
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Error response text:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const data = await response.json();
-      console.log("Satellite-Data:", data);
+      console.log("Satellite Data:", data);
+
+      // Optional: Verarbeiten Sie die Satellitendaten hier
+      return data;
     } catch (error) {
-      console.error("Error retrieving satellite data:", error);
+      console.error("Fehler beim Abrufen der Satellitendaten:", error);
+      throw error;
     }
   };
-
   // Retrieve initial satellite data
   useEffect(() => {
     fetchSatelliteData();

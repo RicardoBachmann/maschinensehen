@@ -46,11 +46,8 @@ app.use(express.json());
 // Root endpoint: Provides API information and available routes
 app.get("/", (req, res) => {
   res.json({
-    message: "Maschinensehen API is running",
-    routes: {
-      test: "/test",
-      satellite: "/api/satellite/position/:lon/:lat/:alt/:num/:id",
-    },
+    message: "Maschinensehen API ist online",
+    routes: ["/satellite/position/:lon/:lat/:alt/:num/:id"],
   });
 });
 
@@ -66,27 +63,28 @@ app.get("/test", (req, res) => {
 });
 
 // Satellite position endpoint: Retrieves satellite position data from N2YO API
-app.get("/api/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
+app.get("/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
   const { lon, lat, alt, num, id } = req.params;
 
-  console.log("Received request with params:", { lon, lat, alt, num, id });
+  console.log("Empfangene Satellitenparameter:", { lon, lat, alt, num, id });
 
   try {
     const apiUrl = `https://api.n2yo.com/rest/v1/satellite/positions/${id}/${lat}/${lon}/${alt}/${num}/?apiKey=${process.env.N2YO_API_KEY}`;
+
     console.log(
-      "Fetching from N2YO API:",
-      apiUrl.replace(process.env.N2YO_API_KEY, "HIDDEN_KEY")
+      "Anfrage an N2YO-API:",
+      apiUrl.replace(process.env.N2YO_API_KEY, "VERSTECKT")
     );
 
     const response = await fetch(apiUrl);
 
-    console.log("N2YO API Response status:", response.status);
+    console.log("N2YO-API Antwort-Status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("N2YO API Error response:", errorText);
+      console.error("N2YO-API Fehlerantwort:", errorText);
       return res.status(response.status).json({
-        error: "Failed to fetch satellite data",
+        error: "Fehler beim Abrufen der Satellitendaten",
         details: errorText,
       });
     }
@@ -94,13 +92,13 @@ app.get("/api/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (error) {
-    console.error("Complete backend error:", error);
+    console.error("Vollständiger Backend-Fehler:", error);
     res.status(500).json({
-      error: "Failed to fetch satellite data",
+      error: "Fehler beim Abrufen der Satellitendaten",
       details:
         process.env.NODE_ENV === "development"
           ? error.message
-          : "Internal Server Error",
+          : "Interner Serverfehler",
     });
   }
 });

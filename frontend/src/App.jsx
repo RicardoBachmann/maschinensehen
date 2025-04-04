@@ -73,10 +73,15 @@ function App() {
 
   // Users position
   const getUserLocation = () => {
+    // checks if geolocation is supported by the browser
     if (navigator.geolocation) {
+      // get the current users location
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log("Users current position:", position);
+          // save geolocation coordinates in two variables
+          const { latitude, longitude } = position.coords;
+          // update the value of userlocation variable
+          setUserLocation({ latitude, longitude });
         },
         (error) => {
           console.error("Error getting users location", error);
@@ -86,10 +91,20 @@ function App() {
       console.error("Geolocation is not supported by this browser");
     }
   };
+  useEffect(() => {
+    getUserLocation();
+  }, []);
 
-  getUserLocation();
   return (
     <>
+      <button onClick={getUserLocation}>Get User Location</button>
+      {userLocation && (
+        <div>
+          <p>User location is: </p>
+          <p>Latitude:{userLocation.latitude.toFixed(5)}</p>
+          <p>Longitude:{userLocation.longitude.toFixed(5)}</p>
+        </div>
+      )}
       <div id="map-container" ref={mapContainerRef}></div>
     </>
   );

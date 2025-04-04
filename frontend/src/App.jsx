@@ -74,7 +74,14 @@ function App() {
   // Users position
   const getUserLocation = () => {
     if (navigator.geolocation) {
-      console.log("Browser supports geolocation method");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("Users current position:", position);
+        },
+        (error) => {
+          console.error("Error getting users location", error);
+        }
+      );
     } else {
       console.error("Geolocation is not supported by this browser");
     }

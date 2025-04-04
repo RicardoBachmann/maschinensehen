@@ -7,11 +7,7 @@ function App() {
   const mapContainerRef = useRef();
 
   // API URL Configuration
-  const API_URL =
-    import.meta.env.VITE_API_BASE_URL ||
-    (import.meta.env.DEV
-      ? "http://localhost:3000"
-      : "https://maschinensehen-r3mu.vercel.app");
+  const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api"; // Relative URL
 
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
@@ -19,7 +15,7 @@ function App() {
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
       center: [-74.5, 40],
-      zoom: 3,
+      zoom: 8,
     });
 
     // Cleanup function
@@ -32,20 +28,42 @@ function App() {
 
   const fetchSatelliteData = async () => {
     try {
-      console.log("Fetching from:", API_URL);
-      const response = await fetch(
-        `${API_URL}/api/satellite/position/10/50/100/1/25544`
+      // Detaillierte Logging-Informationen
+      console.log("Fetching satellite data...");
+      console.log(
+        "Full API URL:",
+        `${API_URL}/satellite/position/10/50/100/1/25544`
       );
+
+      const response = await fetch(
+        `${API_URL}/satellite/position/10/50/100/1/25544`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Zusätzliche Debugging-Informationen
+      console.log("Response status:", response.status);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error response text:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const data = await response.json();
-      console.log("Satellite-Data:", data);
+      console.log("Satellite Data:", data);
+
+      // Optional: Verarbeiten Sie die Satellitendaten hier
+      return data;
     } catch (error) {
-      console.error("Error retrieving satellite data:", error);
+      console.error("Fehler beim Abrufen der Satellitendaten:", error);
+      throw error;
     }
   };
-
   // Retrieve initial satellite data
   useEffect(() => {
     fetchSatelliteData();

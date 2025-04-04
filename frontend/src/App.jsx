@@ -1,10 +1,11 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 function App() {
   const mapRef = useRef();
   const mapContainerRef = useRef();
+  const [userLocation, setUserLocation] = useState(null);
 
   // API URL Configuration
   const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api"; // Relative URL
@@ -64,11 +65,22 @@ function App() {
       throw error;
     }
   };
+
   // Retrieve initial satellite data
   useEffect(() => {
     fetchSatelliteData();
   }, []);
 
+  // Users position
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      console.log("Browser supports geolocation method");
+    } else {
+      console.error("Geolocation is not supported by this browser");
+    }
+  };
+
+  getUserLocation();
   return (
     <>
       <div id="map-container" ref={mapContainerRef}></div>

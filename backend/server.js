@@ -63,14 +63,13 @@ app.get("/test", (req, res) => {
 });
 
 // Satellite position endpoint: Retrieves satellite position data from N2YO API
-app.get("/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
-  const { lon, lat, alt, num, id } = req.params;
+app.get("/satellite/above/:lat/:lon/:alt/:category", async (req, res) => {
+  const { lat, lon, alt, category } = req.params;
 
-  console.log("Empfangene Satellitenparameter:", { lon, lat, alt, num, id });
+  console.log("Received parameters for ‘above’:", { lat, lon, alt, category });
 
   try {
-    const apiUrl = `https://api.n2yo.com/rest/v1/satellite/positions/${id}/${lat}/${lon}/${alt}/${num}/?apiKey=${process.env.N2YO_API_KEY}`;
-
+    const apiUrl = `https://api.n2yo.com/rest/v1/satellite/above/${lat}/${lon}/${alt}/${category}/70/1/&apiKey=${process.env.N2YO_API_KEY}`;
     console.log(
       "Anfrage an N2YO-API:",
       apiUrl.replace(process.env.N2YO_API_KEY, "VERSTECKT")

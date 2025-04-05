@@ -1,10 +1,11 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 function App() {
   const mapRef = useRef();
   const mapContainerRef = useRef();
+  const [userLocation, setUserLocation] = useState(null);
 
   // API URL Configuration
   const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api"; // Relative URL
@@ -64,13 +65,47 @@ function App() {
       throw error;
     }
   };
+
   // Retrieve initial satellite data
   useEffect(() => {
     fetchSatelliteData();
   }, []);
 
+  // Users position
+  const getUserLocation = () => {
+    // checks if geolocation is supported by the browser
+    if (navigator.geolocation) {
+      // get the current users location
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // save geolocation coordinates in two variables
+          const { latitude, longitude } = position.coords;
+          console.log("Users location:", position);
+          // update the value of userlocation variable
+          setUserLocation({ latitude, longitude });
+        },
+        (error) => {
+          console.error("Error getting users location", error);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser");
+    }
+  };
+  useEffect(() => {
+    getUserLocation();
+  }, []);
+
   return (
     <>
+      <button onClick={getUserLocation}>Get User Location</button>
+      {userLocation && (
+        <div>
+          <p>User location is: </p>
+          <p>Latitude:{userLocation.latitude.toFixed(5)}</p>
+          <p>Longitude:{userLocation.longitude.toFixed(5)}</p>
+        </div>
+      )}
       <div id="map-container" ref={mapContainerRef}></div>
     </>
   );

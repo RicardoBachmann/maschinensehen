@@ -80,6 +80,7 @@ function App() {
         (position) => {
           // save geolocation coordinates in two variables
           const { latitude, longitude } = position.coords;
+          console.log("Users location:", position);
           // update the value of userlocation variable
           setUserLocation({ latitude, longitude });
         },

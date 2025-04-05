@@ -27,24 +27,23 @@ function App() {
     };
   }, []);
 
-  const fetchSatelliteData = async () => {
+  const fetchSatellitesAbove = async (latitude, longitude) => {
     try {
       // Detaillierte Logging-Informationen
-      console.log("Fetching satellite data...");
-      console.log(
-        "Full API URL:",
-        `${API_URL}/satellite/position/10/50/100/1/25544`
-      );
+      console.log("Fetching satellite data above users location...");
+      console.log("User coordinates:", latitude, longitude);
 
-      const response = await fetch(
-        `${API_URL}/satellite/position/10/50/100/1/25544`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      // Set altitude to 0 metres (sea level)
+      // Category 0 means all satellites
+      const requestUrl = `${API_URL}/satellite/above/${latitude}/${longitude}/0/0`;
+      console.log("RequestURL:", requestUrl);
+
+      const response = await fetch(requestUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       // Zusätzliche Debugging-Informationen
       console.log("Response status:", response.status);
@@ -56,7 +55,26 @@ function App() {
       }
 
       const data = await response.json();
-      console.log("Satellite Data:", data);
+      console.log("Satellites Above Data:", data);
+
+      // Output of the number of satellites found
+      if (data.info) {
+        console.log(`Satellites found: ${data.info.satcount}`);
+      }
+
+      // Detailed output of each satellite
+      if (data.above) {
+        data.above.forEach((satellite, index) => {
+          console.log(`Satellit ${index + 1}:`);
+          console.log(`  Name: ${satellite.satname}`);
+          console.log(`  ID: ${satellite.satid}`);
+          console.log(
+            `  Position: ${satellite.satlatitude}, ${satellite.satlongitude}`
+          );
+          console.log(`  Höhe: ${satellite.sataltitude} km`);
+          console.log("----------------------------");
+        });
+      }
 
       // Optional: Verarbeiten Sie die Satellitendaten hier
       return data;
@@ -68,7 +86,7 @@ function App() {
 
   // Retrieve initial satellite data
   useEffect(() => {
-    fetchSatelliteData();
+    fetchSatellitesAbove();
   }, []);
 
   // Users position

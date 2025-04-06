@@ -35,7 +35,7 @@ function App() {
 
       // Set altitude to 0 metres (sea level)
       // Category 0 means all satellites
-      const requestUrl = `${API_URL}/satellite/above/${latitude}/${longitude}/0/0`;
+      const requestUrl = `${API_URL}/satellite/above/${latitude}/${longitude}/0/70/0`;
       console.log("RequestURL:", requestUrl);
 
       const response = await fetch(requestUrl, {
@@ -66,12 +66,12 @@ function App() {
       if (data.above) {
         data.above.forEach((satellite, index) => {
           console.log(`Satellit ${index + 1}:`);
-          console.log(`  Name: ${satellite.satname}`);
-          console.log(`  ID: ${satellite.satid}`);
+          console.log(`Name: ${satellite.satname}`);
+          console.log(`ID: ${satellite.satid}`);
           console.log(
-            `  Position: ${satellite.satlatitude}, ${satellite.satlongitude}`
+            `Position: ${satellite.satlatitude}, ${satellite.satlongitude}`
           );
-          console.log(`  Höhe: ${satellite.sataltitude} km`);
+          console.log(`Höhe: ${satellite.sataltitude} km`);
           console.log("----------------------------");
         });
       }
@@ -83,11 +83,6 @@ function App() {
       throw error;
     }
   };
-
-  // Retrieve initial satellite data
-  useEffect(() => {
-    fetchSatellitesAbove();
-  }, []);
 
   // Users position
   const getUserLocation = () => {
@@ -111,8 +106,10 @@ function App() {
     }
   };
   useEffect(() => {
-    getUserLocation();
-  }, []);
+    if (userLocation) {
+      fetchSatellitesAbove(userLocation.latitude, userLocation.longitude);
+    }
+  }, [userLocation]);
 
   return (
     <>

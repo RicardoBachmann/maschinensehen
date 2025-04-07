@@ -8,7 +8,7 @@ function App() {
   const [userLocation, setUserLocation] = useState(null);
 
   // API URL Configuration
-  const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api"; // Relative URL
+  const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api/"; // Relative URL
 
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
@@ -27,16 +27,22 @@ function App() {
     };
   }, []);
 
-  const fetchSatellitesAbove = async (latitude, longitude) => {
+  const fetchSatellitesAbove = async (latitude, longitude, alt = 0) => {
     try {
-      // Detaillierte Logging-Informationen
-      console.log("Fetching satellite data above users location...");
-      console.log("User coordinates:", latitude, longitude);
+      // Default values if the user location not yes available
+      const userLatitude = latitude || 0;
+      const userLongitude = longitude || 0;
+      const searchradius = 90; // Value between 0-90 degrees
+      const categoryId = 30; // 0 for all satellites
 
-      // Set altitude to 0 metres (sea level)
-      // Category 0 means all satellites
-      const requestUrl = `${API_URL}/satellite/above/${latitude}/${longitude}/0/70/0`;
-      console.log("RequestURL:", requestUrl);
+      console.log("Fetching satellites above Location:", {
+        userLatitude,
+        userLongitude,
+        alt,
+      });
+
+      const requestUrl = `${API_URL}/satellite/above/${userLatitude}/${userLongitude}/${alt}/${searchradius}/${categoryId}`;
+      console.log("Full API-URL:", requestUrl);
 
       const response = await fetch(requestUrl, {
         method: "GET",
@@ -55,7 +61,7 @@ function App() {
       }
 
       const data = await response.json();
-      console.log("Satellites Above Data:", data);
+      console.log("Satellites above user:", data);
 
       // Output of the number of satellites found
       if (data.info) {
@@ -63,15 +69,20 @@ function App() {
       }
 
       // Detailed output of each satellite
-      if (data.above) {
+      if (data.info && data.above) {
+        console.log(
+          `Found: ${data.info.satcount} satellites above your location`
+        );
+        // Log each satellite's basic information
         data.above.forEach((satellite, index) => {
-          console.log(`Satellit ${index + 1}:`);
-          console.log(`Name: ${satellite.satname}`);
-          console.log(`ID: ${satellite.satid}`);
           console.log(
-            `Position: ${satellite.satlatitude}, ${satellite.satlongitude}`
+            `Satellite ${index + 1}: ${satellite.satname} (ID: ${
+              satellite.satid
+            })`
           );
-          console.log(`Höhe: ${satellite.sataltitude} km`);
+          console.log(
+            `  Position: Lat ${satellite.satlat}, Lng ${satellite.satlng}, Alt ${satellite.satalt}km`
+          );
           console.log("----------------------------");
         });
       }
@@ -79,7 +90,7 @@ function App() {
       // Optional: Verarbeiten Sie die Satellitendaten hier
       return data;
     } catch (error) {
-      console.error("Fehler beim Abrufen der Satellitendaten:", error);
+      console.error("Error fetching satellite data:", error);
       throw error;
     }
   };

@@ -6,9 +6,10 @@ function App() {
   const mapRef = useRef();
   const mapContainerRef = useRef();
   const [userLocation, setUserLocation] = useState(null);
+  const [satallitesAbove, setSatallitesAbove] = useState(null);
 
   // API URL Configuration
-  const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api"; // Relative URL
+  const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api/"; // Relative URL
 
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
@@ -27,24 +28,29 @@ function App() {
     };
   }, []);
 
-  const fetchSatelliteData = async () => {
+  const fetchSatellitesAbove = async (latitude, longitude, alt = 0) => {
     try {
-      // Detaillierte Logging-Informationen
-      console.log("Fetching satellite data...");
-      console.log(
-        "Full API URL:",
-        `${API_URL}/satellite/position/10/50/100/1/25544`
-      );
+      // Default values if the user location not yes available
+      const userLatitude = latitude || 0;
+      const userLongitude = longitude || 0;
+      const searchradius = 30; // Value between 0-90 degrees
+      const categoryId = 0; // 0 for all satellites
 
-      const response = await fetch(
-        `${API_URL}/satellite/position/10/50/100/1/25544`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      console.log("Fetching satellites above Location:", {
+        userLatitude,
+        userLongitude,
+        alt,
+      });
+
+      const requestUrl = `${API_URL}/satellite/above/${userLatitude}/${userLongitude}/${alt}/${searchradius}/${categoryId}`;
+      console.log("Full API-URL:", requestUrl);
+
+      const response = await fetch(requestUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       // Zusätzliche Debugging-Informationen
       console.log("Response status:", response.status);
@@ -56,22 +62,42 @@ function App() {
       }
 
       const data = await response.json();
-      console.log("Satellite Data:", data);
+      console.log("Satellites above user:", data);
+
+      // Output of the number of satellites found
+      if (data.info) {
+        console.log(`Satellites found: ${data.info.satcount}`);
+        setSatallitesAbove(data.info.satcount);
+      }
+
+      // Detailed output of each satellite
+      if (data.info && data.above) {
+        console.log(
+          `Found: ${data.info.satcount} satellites above your location`
+        );
+        // Log each satellite's basic information
+        data.above.forEach((satellite, index) => {
+          console.log(
+            `Satellite ${index + 1}: ${satellite.satname} (ID: ${
+              satellite.satid
+            })`
+          );
+          console.log(
+            `  Position: Lat ${satellite.satlat}, Lng ${satellite.satlng}, Alt ${satellite.satalt}km`
+          );
+          console.log("----------------------------");
+        });
+      }
 
       // Optional: Verarbeiten Sie die Satellitendaten hier
       return data;
     } catch (error) {
-      console.error("Fehler beim Abrufen der Satellitendaten:", error);
+      console.error("Error fetching satellite data:", error);
       throw error;
     }
   };
 
-  // Retrieve initial satellite data
-  useEffect(() => {
-    fetchSatelliteData();
-  }, []);
-
-  // Users position
+  // Users location
   const getUserLocation = () => {
     // checks if geolocation is supported by the browser
     if (navigator.geolocation) {
@@ -93,8 +119,20 @@ function App() {
     }
   };
   useEffect(() => {
-    getUserLocation();
-  }, []);
+    if (userLocation) {
+      fetchSatellitesAbove(userLocation.latitude, userLocation.longitude);
+    }
+  }, [userLocation]);
+
+  useEffect(() => {
+    if (userLocation && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [userLocation.longitude, userLocation.latitude],
+        zoom: 10,
+        essential: true,
+      });
+    }
+  }, [userLocation]);
 
   return (
     <>
@@ -104,6 +142,7 @@ function App() {
           <p>User location is: </p>
           <p>Latitude:{userLocation.latitude.toFixed(5)}</p>
           <p>Longitude:{userLocation.longitude.toFixed(5)}</p>
+          <p>Satelittes above you:{satallitesAbove || "Loading..."}</p>
         </div>
       )}
       <div id="map-container" ref={mapContainerRef}></div>

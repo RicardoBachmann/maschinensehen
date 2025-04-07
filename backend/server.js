@@ -47,7 +47,10 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.json({
     message: "Maschinensehen API ist online",
-    routes: ["/satellite/position/:lon/:lat/:alt/:num/:id"],
+    routes: [
+      "/satellite/position/:lon/:lat/:alt/:num/:id",
+      "/satellite/above/:lat/:lon/:alt/:radius/:category",
+    ],
   });
 });
 
@@ -62,46 +65,54 @@ app.get("/test", (req, res) => {
   });
 });
 
-// Satellite position endpoint: Retrieves satellite position data from N2YO API
-app.get("/satellite/position/:lon/:lat/:alt/:num/:id", async (req, res) => {
-  const { lon, lat, alt, num, id } = req.params;
+// Satellite "above" endpoint: Retrieves satellites above a location from N2YO API
+app.get(
+  "/satellite/above/:lat/:lon/:alt/:radius/:category",
+  async (req, res) => {
+    const { lat, lon, alt, radius, category } = req.params;
 
-  console.log("Empfangene Satellitenparameter:", { lon, lat, alt, num, id });
+    console.log("Received parameters for ‘above’:", {
+      lat,
+      lon,
+      alt,
+      radius,
+      category,
+    });
 
-  try {
-    const apiUrl = `https://api.n2yo.com/rest/v1/satellite/positions/${id}/${lat}/${lon}/${alt}/${num}/?apiKey=${process.env.N2YO_API_KEY}`;
+    try {
+      const apiUrl = `https://api.n2yo.com/rest/v1/satellite/above/${lat}/${lon}/${alt}/${radius}/${category}/?apiKey=${process.env.N2YO_API_KEY}`;
+      console.log(
+        "Request to N2YO-API:",
+        apiUrl.replace(process.env.N2YO_API_KEY, "HIDDEN")
+      );
 
-    console.log(
-      "Anfrage an N2YO-API:",
-      apiUrl.replace(process.env.N2YO_API_KEY, "VERSTECKT")
-    );
+      const response = await fetch(apiUrl);
 
-    const response = await fetch(apiUrl);
+      console.log("N2YO-API Response Status:", response.status);
 
-    console.log("N2YO-API Antwort-Status:", response.status);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("N2YO-API Error response:", errorText);
+        return res.status(response.status).json({
+          error: "Error retrieving satellite data",
+          details: errorText,
+        });
+      }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("N2YO-API Fehlerantwort:", errorText);
-      return res.status(response.status).json({
-        error: "Fehler beim Abrufen der Satellitendaten",
-        details: errorText,
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error("Backend error:", error);
+      res.status(500).json({
+        error: "Error retrieving satellite data",
+        details:
+          process.env.NODE_ENV === "development"
+            ? error.message
+            : "Internal server error",
       });
     }
-
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error("Vollständiger Backend-Fehler:", error);
-    res.status(500).json({
-      error: "Fehler beim Abrufen der Satellitendaten",
-      details:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Interner Serverfehler",
-    });
   }
-});
+);
 
 // ---- Server Export & Start ----
 module.exports = app;

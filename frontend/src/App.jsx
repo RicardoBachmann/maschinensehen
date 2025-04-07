@@ -6,6 +6,7 @@ function App() {
   const mapRef = useRef();
   const mapContainerRef = useRef();
   const [userLocation, setUserLocation] = useState(null);
+  const [satallitesAbove, setSatallitesAbove] = useState(null);
 
   // API URL Configuration
   const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api/"; // Relative URL
@@ -32,8 +33,8 @@ function App() {
       // Default values if the user location not yes available
       const userLatitude = latitude || 0;
       const userLongitude = longitude || 0;
-      const searchradius = 90; // Value between 0-90 degrees
-      const categoryId = 30; // 0 for all satellites
+      const searchradius = 30; // Value between 0-90 degrees
+      const categoryId = 0; // 0 for all satellites
 
       console.log("Fetching satellites above Location:", {
         userLatitude,
@@ -66,6 +67,7 @@ function App() {
       // Output of the number of satellites found
       if (data.info) {
         console.log(`Satellites found: ${data.info.satcount}`);
+        setSatallitesAbove(data.info.satcount);
       }
 
       // Detailed output of each satellite
@@ -95,7 +97,7 @@ function App() {
     }
   };
 
-  // Users position
+  // Users location
   const getUserLocation = () => {
     // checks if geolocation is supported by the browser
     if (navigator.geolocation) {
@@ -122,6 +124,16 @@ function App() {
     }
   }, [userLocation]);
 
+  useEffect(() => {
+    if (userLocation && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [userLocation.longitude, userLocation.latitude],
+        zoom: 10,
+        essential: true,
+      });
+    }
+  }, [userLocation]);
+
   return (
     <>
       <button onClick={getUserLocation}>Get User Location</button>
@@ -130,6 +142,7 @@ function App() {
           <p>User location is: </p>
           <p>Latitude:{userLocation.latitude.toFixed(5)}</p>
           <p>Longitude:{userLocation.longitude.toFixed(5)}</p>
+          <p>Satelittes above you:{satallitesAbove || "Loading..."}</p>
         </div>
       )}
       <div id="map-container" ref={mapContainerRef}></div>

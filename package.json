@@ -13,7 +13,7 @@
     "express": "^4.18.2",
     "mapbox-gl": "^3.10.0",
     "node-fetch": "^2.7.0",
-    "styled-components": "^6.1.15"
+    "styled-components": "^6.1.17"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import GridOverlay from "../components/BasicGridOverlay";
 
 function App() {
   const mapRef = useRef();
@@ -33,7 +34,7 @@ function App() {
       // Default values if the user location not yes available
       const userLatitude = latitude || 0;
       const userLongitude = longitude || 0;
-      const searchradius = 30; // Value between 0-90 degrees
+      const searchradius = 70; // Value between 0-90 degrees
       const categoryId = 0; // 0 for all satellites
 
       console.log("Fetching satellites above Location:", {
@@ -136,6 +137,7 @@ function App() {
 
   return (
     <>
+      <GridOverlay />
       <button onClick={getUserLocation}>Get User Location</button>
       {userLocation && (
         <div>

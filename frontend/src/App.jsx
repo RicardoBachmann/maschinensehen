@@ -18,7 +18,7 @@ function App() {
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/satellite-v9",
-      center: [-74.5, 40],
+      center: [-74.5, 49],
       zoom: 4,
     }).on("load", () => {
       console.log("App: Map load-Event triggered");

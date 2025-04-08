@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import mapboxgl from "mapbox-gl";
 
 const GridComponent = ({ map }) => {
   const [status, setStatus] = useState("initializing");
@@ -7,10 +8,29 @@ const GridComponent = ({ map }) => {
     console.log("GridComponent: Component has been loaded");
     console.log("GridComponent: Receive map prop", map);
 
-    if (map) {
-      setStatus("map received");
-    } else {
+    if (!map) {
       setStatus("no map received");
+      return;
+    }
+    setStatus("map recevied");
+
+    // Add test-marker
+    try {
+      console.log("GridComponent: Try to add marker");
+      const center = map.getCenter();
+      console.log("GridComponent: Center of the map", center);
+
+      const marker = new mapboxgl.Marker({ color: "#FF0000" })
+        .setLngLat(center)
+        .addTo(map);
+
+      console.log("GridComponent: Marker successfully added");
+      setStatus(
+        "marker added at" + center.lng.toFixed(4) + ", " + center.lat.toFixed(4)
+      );
+    } catch (error) {
+      console.error("GridComponent: Error to add marker:", error);
+      setStatus("marker error: " + error.message);
     }
   }, [map]);
 

@@ -6,6 +6,7 @@ import GridComponent from "../components/GridComponent";
 function App() {
   const mapRef = useRef();
   const mapContainerRef = useRef();
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [satallitesAbove, setSatallitesAbove] = useState(null);
 
@@ -19,6 +20,9 @@ function App() {
       style: "mapbox://styles/mapbox/satellite-v9",
       center: [-74.5, 40],
       zoom: 4,
+    }).on("load", () => {
+      console.log("App: Map load-Event triggered");
+      setMapLoaded(true);
     });
 
     // Cleanup function
@@ -137,7 +141,7 @@ function App() {
 
   return (
     <>
-      <GridComponent map={mapRef.current} />
+      {mapLoaded && <GridComponent map={mapRef.current} />}
       <button onClick={getUserLocation}>Get User Location</button>
       {userLocation && (
         <div>

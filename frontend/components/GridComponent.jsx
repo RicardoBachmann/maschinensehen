@@ -1,9 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-const GridComponent = () => {
+const GridComponent = ({ map }) => {
+  const [status, setStatus] = useState("initializing");
+
   useEffect(() => {
     console.log("GridComponent: Component has been loaded");
-  }, []);
+    console.log("GridComponent: Receive map prop", map);
+
+    if (map) {
+      setStatus("map received");
+    } else {
+      setStatus("no map received");
+    }
+  }, [map]);
 
   return (
     <div
@@ -16,7 +25,7 @@ const GridComponent = () => {
         zIndex: 999,
       }}
     >
-      Grid Component Loaded
+      Grid Status: {status}
     </div>
   );
 };

@@ -8,7 +8,8 @@ function App() {
   const mapContainerRef = useRef();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
-  const [satallitesAbove, setSatallitesAbove] = useState(null);
+  const [satellitesAbove, setSatellitesAbove] = useState(null);
+  const [satelliteRadius, setSatelliteRadius] = useState(70);
 
   // API URL Configuration
   const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api/"; // Relative URL
@@ -38,7 +39,7 @@ function App() {
       // Default values if the user location not yes available
       const userLatitude = latitude || 0;
       const userLongitude = longitude || 0;
-      const searchradius = 10; // Value between 0-90 degrees
+      const searchradius = satelliteRadius; // Value between 0-90 degrees
       const categoryId = 0; // 0 for all satellites
 
       console.log("Fetching satellites above Location:", {
@@ -72,7 +73,7 @@ function App() {
       // Output of the number of satellites found
       if (data.info) {
         console.log(`Satellites found: ${data.info.satcount}`);
-        setSatallitesAbove(data.info.satcount);
+        setSatellitesAbove(data.info.satcount);
       }
 
       // Detailed output of each satellite
@@ -148,7 +149,18 @@ function App() {
           <p>User location is: </p>
           <p>Latitude:{userLocation.latitude.toFixed(5)}</p>
           <p>Longitude:{userLocation.longitude.toFixed(5)}</p>
-          <p>Satelittes above you:{satallitesAbove || "Loading..."}</p>
+          <lable>Search radius:{satelliteRadius}°</lable>
+          <input
+            type="range"
+            min={0}
+            max={90}
+            value={satelliteRadius}
+            onChange={(e) => {
+              setSatelliteRadius(e.target.valueAsNumber);
+            }}
+          ></input>
+
+          <p>Satelittes above you:{satellitesAbove || "Loading..."}</p>
         </div>
       )}
       <div id="map-container" ref={mapContainerRef}></div>

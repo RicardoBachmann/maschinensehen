@@ -3,6 +3,8 @@ import mapboxgl from "mapbox-gl";
 
 const GridComponent = ({ map }) => {
   const [status, setStatus] = useState("initializing");
+  const [latLines, setLatLines] = useState(10);
+  const [lngLines, setLngLines] = useState(10);
 
   // Function to create grid-geoJSON
   const createGridGeoJSON = () => {
@@ -17,8 +19,8 @@ const GridComponent = ({ map }) => {
     const ne = bounds.getNorthEast();
 
     // Calculate the size for each grid cell (10x10 grid)
-    const lngDelta = (ne.lng - sw.lng) / 10;
-    const latDelta = (ne.lat - sw.lat) / 10;
+    const lngDelta = (ne.lng - sw.lng) / lngLines;
+    const latDelta = (ne.lat - sw.lat) / latLines;
 
     console.log("Grid Component: Grid-Size:", { lngDelta, latDelta });
 
@@ -26,7 +28,7 @@ const GridComponent = ({ map }) => {
     const features = [];
 
     // Horizontal lines
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 0; i <= latLines; i++) {
       const lat = sw.lat + i * latDelta;
       features.push({
         type: "Feature",
@@ -41,7 +43,7 @@ const GridComponent = ({ map }) => {
     }
 
     // Vertical lines
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 0; i <= lngLines; i++) {
       const lng = sw.lng + i * lngDelta;
       features.push({
         type: "Feature",
@@ -141,7 +143,7 @@ const GridComponent = ({ map }) => {
         map.removeSource("grid-source");
       }
     };
-  }, [map]);
+  }, [map, latLines, lngLines]);
 
   return (
     <div
@@ -149,12 +151,34 @@ const GridComponent = ({ map }) => {
         position: "absolute",
         top: "50px",
         left: "10px",
-        background: "white",
+        background: !map ? "red " : "green",
         padding: "5px",
         zIndex: 999,
       }}
     >
-      Grid Status: {status}
+      <div>Grid Status: {status}</div>
+      <div style={{ marginTop: "10px" }}>
+        <lable>
+          Horizontale Linien:
+          <input
+            type="number"
+            min="2"
+            max="50"
+            value={latLines}
+            onChange={(e) => setLatLines(parseInt(e.target.value, 10))}
+            style={{ width: "50px", maginLeft: "5px" }}
+          ></input>
+          Vertikale Linien:
+          <input
+            type="number"
+            min="2"
+            max="50"
+            value={lngLines}
+            onChange={(e) => setLngLines(parseInt(e.target.value, 10))}
+            style={{ width: "50px", maginLeft: "5px" }}
+          ></input>
+        </lable>
+      </div>
     </div>
   );
 };

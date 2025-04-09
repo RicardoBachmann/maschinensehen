@@ -70,6 +70,48 @@ function App() {
       const data = await response.json();
       console.log("Satellites above user:", data);
 
+      const satellitesGeoJSON = {
+        type: "FeatureCollection",
+        features: data.above.map((satellite) => {
+          return {
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [satellite.satlng, satellite.satlat],
+            },
+            properties: {
+              satname: satellite.satname,
+              satid: satellite.satid,
+              satalt: satellite.satalt,
+            },
+          };
+        }),
+      };
+
+      if (mapRef.current && mapRef.current.loaded()) {
+        //checks if Source/layer exist
+        if (mapRef.current.getSource("satellites-source")) {
+          mapRef.current.removeLayer("satellites-layer");
+          mapRef.current.removeSource("satellites-source");
+        }
+        mapRef.current.addSource("satellites-source", {
+          type: "geojson",
+          data: satellitesGeoJSON,
+        });
+
+        // Add layer
+        mapRef.current.addLayer({
+          id: "satellites-layer",
+          type: "circle",
+          source: "satellites-source",
+          paint: {
+            "circle-radius": 6,
+            "circle-color": "#ff0000",
+            "circle-opacity": 0.8,
+          },
+        });
+      }
+
       // Output of the number of satellites found
       if (data.info) {
         console.log(`Satellites found: ${data.info.satcount}`);
@@ -149,7 +191,7 @@ function App() {
           <p>User location is: </p>
           <p>Latitude:{userLocation.latitude.toFixed(5)}</p>
           <p>Longitude:{userLocation.longitude.toFixed(5)}</p>
-          <lable>Search radius:{satelliteRadius}°</lable>
+          <label>Search radius:{satelliteRadius}°</label>
           <input
             type="range"
             min={0}

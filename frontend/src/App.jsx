@@ -1,12 +1,15 @@
 import { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import GridComponent from "../components/GridComponent";
 
 function App() {
   const mapRef = useRef();
   const mapContainerRef = useRef();
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
-  const [satallitesAbove, setSatallitesAbove] = useState(null);
+  const [satellitesAbove, setSatellitesAbove] = useState(null);
+  const [satelliteRadius, setSatelliteRadius] = useState(70);
 
   // API URL Configuration
   const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api/"; // Relative URL
@@ -15,9 +18,12 @@ function App() {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/streets-v12",
-      center: [-74.5, 40],
-      zoom: 8,
+      style: "mapbox://styles/mapbox/satellite-v9",
+      center: [-74.5, 49],
+      zoom: 4,
+    }).on("load", () => {
+      console.log("App: Map load-Event triggered");
+      setMapLoaded(true);
     });
 
     // Cleanup function
@@ -33,7 +39,7 @@ function App() {
       // Default values if the user location not yes available
       const userLatitude = latitude || 0;
       const userLongitude = longitude || 0;
-      const searchradius = 30; // Value between 0-90 degrees
+      const searchradius = satelliteRadius; // Value between 0-90 degrees
       const categoryId = 0; // 0 for all satellites
 
       console.log("Fetching satellites above Location:", {
@@ -64,10 +70,52 @@ function App() {
       const data = await response.json();
       console.log("Satellites above user:", data);
 
+      const satellitesGeoJSON = {
+        type: "FeatureCollection",
+        features: data.above.map((satellite) => {
+          return {
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [satellite.satlng, satellite.satlat],
+            },
+            properties: {
+              satname: satellite.satname,
+              satid: satellite.satid,
+              satalt: satellite.satalt,
+            },
+          };
+        }),
+      };
+
+      if (mapRef.current && mapRef.current.loaded()) {
+        //checks if Source/layer exist
+        if (mapRef.current.getSource("satellites-source")) {
+          mapRef.current.removeLayer("satellites-layer");
+          mapRef.current.removeSource("satellites-source");
+        }
+        mapRef.current.addSource("satellites-source", {
+          type: "geojson",
+          data: satellitesGeoJSON,
+        });
+
+        // Add layer
+        mapRef.current.addLayer({
+          id: "satellites-layer",
+          type: "circle",
+          source: "satellites-source",
+          paint: {
+            "circle-radius": 6,
+            "circle-color": "#ff0000",
+            "circle-opacity": 0.8,
+          },
+        });
+      }
+
       // Output of the number of satellites found
       if (data.info) {
         console.log(`Satellites found: ${data.info.satcount}`);
-        setSatallitesAbove(data.info.satcount);
+        setSatellitesAbove(data.info.satcount);
       }
 
       // Detailed output of each satellite
@@ -136,13 +184,25 @@ function App() {
 
   return (
     <>
+      {mapLoaded && <GridComponent map={mapRef.current} />}
       <button onClick={getUserLocation}>Get User Location</button>
       {userLocation && (
         <div>
           <p>User location is: </p>
           <p>Latitude:{userLocation.latitude.toFixed(5)}</p>
           <p>Longitude:{userLocation.longitude.toFixed(5)}</p>
-          <p>Satelittes above you:{satallitesAbove || "Loading..."}</p>
+          <label>Search radius:{satelliteRadius}°</label>
+          <input
+            type="range"
+            min={0}
+            max={90}
+            value={satelliteRadius}
+            onChange={(e) => {
+              setSatelliteRadius(e.target.valueAsNumber);
+            }}
+          ></input>
+
+          <p>Satelittes above you:{satellitesAbove || "Loading..."}</p>
         </div>
       )}
       <div id="map-container" ref={mapContainerRef}></div>

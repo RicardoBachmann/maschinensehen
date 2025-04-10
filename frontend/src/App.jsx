@@ -98,7 +98,6 @@ function App() {
           type: "geojson",
           data: satellitesGeoJSON,
         });
-
         // Add layer
         mapRef.current.addLayer({
           id: "satellites-layer",
@@ -111,6 +110,26 @@ function App() {
           },
         });
       }
+      // Füge den Textlayer für die Namen hinzu
+      mapRef.current.addLayer({
+        id: "satellites-text-layer",
+        type: "symbol",
+        source: "satellites-source",
+        layout: {
+          "text-field": ["get", "satname"],
+          "text-font": ["Open Sans Regular"],
+          "text-size": 12,
+          "text-offset": [0, 1], // Text wird unterhalb des Punktes angezeigt
+          "text-anchor": "top",
+          "text-allow-overlap": false,
+          "text-ignore-placement": false,
+        },
+        paint: {
+          "text-color": "#ffffff",
+          "text-halo-color": "#000000",
+          "text-halo-width": 1,
+        },
+      });
 
       // Output of the number of satellites found
       if (data.info) {

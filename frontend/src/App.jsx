@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import GridComponent from "../components/GridComponent";
+import setupUTMProjection from "../components/setupUTMProjection";
 
 function App() {
   const mapRef = useRef();
@@ -91,7 +92,11 @@ function App() {
       if (mapRef.current && mapRef.current.loaded()) {
         //checks if Source/layer exist
         if (mapRef.current.getSource("satellites-source")) {
+          // Entferne zuerst den Text-Layer
+          mapRef.current.removeLayer("satellites-text-layer");
+          // Dann den Haupt-Layer
           mapRef.current.removeLayer("satellites-layer");
+          // Erst dann die Quelle
           mapRef.current.removeSource("satellites-source");
         }
         mapRef.current.addSource("satellites-source", {
@@ -130,6 +135,7 @@ function App() {
           "text-halo-width": 1,
         },
       });
+      4;
 
       // Output of the number of satellites found
       if (data.info) {
@@ -176,6 +182,7 @@ function App() {
           console.log("Users location:", position);
           // update the value of userlocation variable
           setUserLocation({ latitude, longitude });
+          setupUTMProjection(longitude, latitude);
         },
         (error) => {
           console.error("Error getting users location", error);

@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import GridComponent from "../components/GridComponent";
 import setupUTMProjection from "../components/setupUTMProjection";
+import UTMGridComponent from "../components/UTMGridComponent";
 
 function App() {
   const mapRef = useRef();
@@ -135,7 +135,9 @@ function App() {
           "text-halo-width": 1,
         },
       });
-      4;
+
+      // Add UTM-Grid
+      mapRef.current.addLayer({});
 
       // Output of the number of satellites found
       if (data.info) {
@@ -210,13 +212,17 @@ function App() {
 
   return (
     <>
-      {mapLoaded && <GridComponent map={mapRef.current} />}
+      {mapLoaded && <UTMGridComponent map={mapRef.current} />}
       <button onClick={getUserLocation}>Get User Location</button>
       {userLocation && (
         <div>
           <p>User location is: </p>
           <p>Latitude:{userLocation.latitude.toFixed(5)}</p>
           <p>Longitude:{userLocation.longitude.toFixed(5)}</p>
+          <p>
+            Users UTM Zone:{getUTMZone(userLocation.longitude)}
+            {userLocation.latitude >= 0 ? "N" : "S"}
+          </p>
           <label>Search radius:{satelliteRadius}°</label>
           <input
             type="range"

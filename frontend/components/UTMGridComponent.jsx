@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import proj4 from "proj4";
 import setupUTMProjection from "./setupUTMProjection";
+import createUTMGrid from "./createUTMGrid";
 
 const UTMGridComponent = ({ map }) => {
   console.log("UTMGridComponent wird gerendert", { mapExists: !!map });
@@ -22,7 +23,7 @@ const UTMGridComponent = ({ map }) => {
     if (!map) return;
 
     try {
-      console.log("Map-Object existing:", Object.key(map).slice(0, 5));
+      console.log("Map-Object existing:", Object.keys(map).slice(0, 5));
     } catch (error) {
       console.error("Error accessing map:", error);
     }
@@ -70,6 +71,37 @@ const UTMGridComponent = ({ map }) => {
 
       console.log("SW in UTM:", swUTM);
       console.log("NEin UTM:", neUTM);
+
+      // Add grid-source
+      const gridGeoJSON = createUTMGrid(swUTM, neUTM, utmProjection);
+      console.log("Grid GeoJSON:", gridGeoJSON);
+      if (gridGeoJSON && gridGeoJSON.features.length > 0) {
+        console.log("Gird has:", gridGeoJSON.features.length, "features");
+        if (map.getSource("utm-grid-source")) {
+          console.log("Source exists already, remove it");
+          if (map.getLayer("utm-grid-layer")) {
+            map.removeLayer("utm-grid-layer");
+          }
+          map.removeSource("utm-grid-source");
+        }
+        console.log("Add grid-source layer");
+        map.addSource("utm-grid-source", {
+          type: "geojson",
+          data: gridGeoJSON,
+        });
+
+        // addLayer
+        map.addLayer({
+          id: "utm-grid-layer",
+          type: "line",
+          source: "utm-grid-source",
+          paint: {
+            "line-color": "#FF0000",
+            "line-width": 3, // Breiter
+            "line-opacity": 1, // Keine Transparenz
+          },
+        });
+      }
 
       if (
         Array.isArray(swUTM) &&

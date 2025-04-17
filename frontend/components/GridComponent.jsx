@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import mapboxgl from "mapbox-gl";
 
 const GridComponent = ({ map }) => {
   const [status, setStatus] = useState("initializing");

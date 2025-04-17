@@ -1,9 +1,10 @@
 import proj4 from "proj4";
 
+export const getUTMZone = (longitude) => {
+  return Math.floor((longitude + 180) / 6) + 1;
+};
+
 const setupUTMProjection = (longitude, latitude) => {
-  const getUTMZone = (longitude) => {
-    return Math.floor((longitude + 180) / 6) + 1;
-  };
   const zone = getUTMZone(longitude);
   const hemisphere = latitude >= 0 ? "N" : "S";
 

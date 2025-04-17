@@ -1,7 +1,9 @@
 import { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import setupUTMProjection from "../components/setupUTMProjection";
+import setupUTMProjection, {
+  getUTMZone,
+} from "../components/setupUTMProjection";
 import UTMGridComponent from "../components/UTMGridComponent";
 
 function App() {
@@ -241,5 +243,4 @@ function App() {
     </>
   );
 }
-
 export default App;

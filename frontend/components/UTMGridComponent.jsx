@@ -3,8 +3,31 @@ import proj4 from "proj4";
 import setupUTMProjection from "./setupUTMProjection";
 
 const UTMGridComponent = ({ map }) => {
+  console.log("UTMGridComponent wird gerendert", { mapExists: !!map });
   const [latLines, setLatLines] = useState(100);
   const [lngLines, setLngLines] = useState(100);
+  // Add component state to force a reaction
+  const [hasRun, setHasRun] = useState(false);
+
+  useEffect(() => {
+    console.log("Simple useEffect without Dependencies");
+    setHasRun(true);
+  }, []);
+
+  useEffect(() => {
+    console.log("useEffect with map dependency is executed:", {
+      mapExists: !!map,
+      hasRun,
+    });
+    if (!map) return;
+
+    try {
+      console.log("Map-Object existing:", Object.key(map).slice(0, 5));
+    } catch (error) {
+      console.error("Error accessing map:", error);
+    }
+  }, [map, hasRun]);
+
   console.log("UTMGridComponent wird gerendert");
   useEffect(() => {
     console.log("UTMGridComponent useEffect ausgeführt");
@@ -69,6 +92,20 @@ const UTMGridComponent = ({ map }) => {
     }
   }, [map]);
 
-  return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 10,
+        left: 10,
+        background: "rgba(255,0,0,0.5)",
+        padding: "5px",
+        color: "white",
+        zIndex: 1000,
+      }}
+    >
+      UTM Grid {hasRun ? "(Effect ran)" : "(No effect yet)"}
+    </div>
+  );
 };
 export default UTMGridComponent;
